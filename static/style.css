@@ -1,0 +1,13 @@
+body {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+img {
+  max-width: 100px;
+}
+#content {
+  width: 50%;
+}
