@@ -1,5 +1,7 @@
 """Models for Blogly."""
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -18,8 +20,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(15), nullable=False)
     last_name = db.Column(db.String(15), nullable=False)
-    image_url = db.Column(db.String(
-        100), nullable=False, default="https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png")
+    image_url = db.Column(db.Text, nullable=False, default="https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png")
+
+    posts = db.relationship('Post', backref="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         """Show info about user."""
@@ -28,7 +31,36 @@ class User(db.Model):
         return f"<User {u.id} {u.first_name} {u.last_name}>"
 
     def get_full_name(self):
+        """returns users full name"""
         u = self
         return f"{u.first_name} {u.last_name}"
 
     full_name = property(fget=get_full_name)
+
+class Post(db.Model):
+    """Blog post class"""
+
+    __tablename__ = "posts"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        """Show info about post."""
+
+        p = self
+        return f"<Post {p.id} {p.title} {p.content} {p.created_at} {p.user_id}>"
+
+    def get_friendly_datetime(self):
+        """returns date in standard format"""
+        p = self
+        return p.created_at.strftime("%a %b %-d %Y, %-I:%M %p")
+
+    def update_time(self):
+        """returns current time for updated posts"""
+        return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    friendly_datetime = property(fget=get_friendly_datetime)

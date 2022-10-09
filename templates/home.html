@@ -1,0 +1,10 @@
+{% extends "base.html" %} {% block title %} Home {% endblock %} {% block content
+%}
+<h1>Blogly Recent Posts</h1>
+{% if posts %} {% for post in posts %}
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<p>By {{ post.user.full_name }} on {{ post.friendly_datetime }}</p>
+{% endfor %} {% else %} {% endif %}
+<a href="/users" class="btn btn-primary">Users</a>
+{% endblock %}

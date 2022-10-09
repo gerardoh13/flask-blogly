@@ -11,3 +11,7 @@ img {
 #content {
   width: 50%;
 }
+
+#err404 {
+  max-width: 900px;
+}
