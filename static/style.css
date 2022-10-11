@@ -15,3 +15,7 @@ img {
 #err404 {
   max-width: 900px;
 }
+
+#nav {
+  width: 100%;
+}

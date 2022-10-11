@@ -2,12 +2,12 @@
 
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, redirect, render_template, request, flash
-from models import db, connect_db, User, Post, desc
+from models import db, connect_db, User, Post, Tag, desc
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 connect_db(app)
@@ -145,3 +145,68 @@ def delete_post(post_id):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+# ------------------------------------------------------------------------------
+
+@app.route("/tags")
+def list_tags():
+    """Displays a list of tags"""
+    tags = Tag.query.all()
+    return render_template("tags-list.html", tags=tags)
+
+@app.route("/tags/<int:tag_id>")
+def show_tags(tag_id):
+    """Shows tag of a given id"""
+    tag = Tag.query.get_or_404(tag_id)
+    posts = tag.posts
+    return render_template("tag-details.html", tag=tag, posts=posts)
+
+@app.route("/tags/new")
+def show_tags_form():
+    """Shows form to add new tag"""
+    posts = Post.query.all()
+    return render_template("new-tag.html", posts=posts)
+
+@app.route("/tags/new", methods=["POST"])
+def add_tag():
+    post_ids = request.form.getlist('id')
+    name = request.form['name']
+
+    new_tag = Tag(name=name)
+    db.session.add(new_tag)
+    db.session.commit()
+    flash(f"Tag '{name}' added!")
+    if post_ids:
+        for post_id in post_ids:
+            post = Post.query.get_or_404(post_id)
+            post.tags.append(new_tag)
+            db.session.commit()
+    return redirect("/tags")
+
+@app.route("/tags/<int:tag_id>/edit")
+def show_edit_tag_form(tag_id):
+    """Shows form to edit a tag"""
+    tag = Tag.query.get_or_404(tag_id)
+    posts = Post.query.all()
+    return render_template("edit-tag.html", tag=tag, posts=posts)
+
+# @app.route("/posts/<int:post_id>/edit", methods=["POST"])
+# def edit_post(post_id):
+#     post = Post.query.filter(Post.id == post_id).first()
+#     post.title = request.form['title']
+#     post.content = request.form['content']
+#     post.created_at = post.update_time()
+#     db.session.add(post)
+#     db.session.commit()
+#     flash(f"Post '{ post.title }' modified!")
+#     return redirect(f"/posts/{post_id}")
+
+# @app.route("/posts/<int:post_id>/delete")
+# def delete_post(post_id):
+#     """Deletes post of a given id"""
+#     post = Post.query.get_or_404(post_id)
+#     user_id = post.user.id
+#     db.session.delete(post)
+#     db.session.commit()
+#     flash(f"Post '{ post.title }' has been deleted!")
+#     return redirect(f"/users/{user_id}")
