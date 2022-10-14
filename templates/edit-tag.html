@@ -19,13 +19,17 @@ content %}
   {% if posts %}
   <h4>Add this tag to some posts</h4>
   {% for post in posts %}
-  <input type="checkbox" name="id" value="{{ post.id }}" checked />
+  {% if tag in post.tags %}
+  <input type="checkbox" name="remove_ids" value="{{ post.id }}" checked />
+  {% else %}
+  <input type="checkbox" name="id" value="{{ post.id }}" />
+  {% endif %}
   <label for="id">{{ post.title }}</label><br />
   {% endfor %} {% else %}
   <h3>There are no posts!</h3>
   {% endif %}
   <br />
   <a href="/tags" class="btn btn-info">Cancel</a>
-  <button class="btn btn-success">Add</button>
+  <button class="btn btn-success">Edit</button>
 </form>
 {% endblock %}

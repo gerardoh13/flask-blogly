@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app
-from models import db, User, Post
+from models import db, User, Post, Tag
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly_test'
 app.config['SQLALCHEMY_ECHO'] = False
@@ -22,6 +22,7 @@ class UserViewsTestCase(TestCase):
 
         Post.query.delete()
         User.query.delete()
+        Tag.query.delete()
 
         user = User(first_name="Big", last_name="Chungus", image_url=None)
         db.session.add(user)
@@ -30,9 +31,13 @@ class UserViewsTestCase(TestCase):
                     content="This is a test of the emergency broadcast system", user_id=user.id)
         db.session.add(post)
         db.session.commit()
+        tag = Tag(name="Something")
+        db.session.add(tag)
+        db.session.commit()
 
         self.user_id = user.id
         self.post_id = post.id
+        self.tag_id = tag.id
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -65,7 +70,7 @@ class UserViewsTestCase(TestCase):
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<a href="/users/3">test user</a>', html)
+            self.assertIn(f'<a href="/users/{self.user_id + 1}">test user</a>', html)
 
     def test_edit_user(self):
         """tests that user details are modified correctly"""
@@ -80,7 +85,7 @@ class UserViewsTestCase(TestCase):
                 f'<a href="/users/{self.user_id}">Small Chungus</a>', html)
 
     def test_show_post(self):
-        """tests that post details are displayed in /post/id route"""
+        """tests that post details are displayed in /posts/id route"""
         with app.test_client() as client:
             resp = client.get(f"/posts/{self.post_id}")
             html = resp.get_data(as_text=True)
@@ -108,4 +113,23 @@ class UserViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<a href="/posts/2">New Test Post</a>', html)
+
+    def test_show_tag(self):
+        """tests that tag details are displayed in /tags/id route"""
+        with app.test_client() as client:
+            resp = client.get(f"/tags/{self.tag_id}")
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h2>Something</h2>', html)
+
+    def test_add_tag(self):
+        """tests that new tags are added correctly"""
+        with app.test_client() as client:
+            d = {"name": "Test"}
+            resp = client.post(f"/tags/new", data=d, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(f'<a href="/tags/{self.tag_id + 1}">Test</a>', html)
       

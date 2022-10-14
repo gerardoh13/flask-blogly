@@ -12,8 +12,20 @@ content %}
   <label for="content">Post Content</label>
   <textarea name="content" class="form-control">{{post.content }}</textarea>
   <br />
-
-  <a href="/users/{{ user.id }}" class="btn btn-info">Cancel</a>
-  <button class="btn btn-success">Edit</button>
+  {% if tags %}
+  <h4>Add some tags to this post</h4>
+  {% for tag in tags %}
+  {% if tag in post.tags %}
+  <input type="checkbox" name="remove_ids" value="{{ tag.id }}" checked />
+  {% else %}
+  <input type="checkbox" name="id" value="{{ tag.id }}" />
+  {% endif %}
+  <label for="id">{{ tag.name }}</label><br />
+  {% endfor %} {% endif %}
+  <br />
+  <div class="btnDiv">
+    <a href="/users/{{ post.user_id}}" class="btn btn-info">Cancel</a>
+    <button class="btn btn-success">Edit</button>
+  </div>
 </form>
 {% endblock %}

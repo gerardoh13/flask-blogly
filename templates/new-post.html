@@ -16,7 +16,13 @@ content %}
     placeholder="Content goes here."
   ></textarea>
   <br />
-
+  {% if tags %}
+  <h4>Add some tags to this post</h4>
+  {% for tag in tags %}
+  <input type="checkbox" name="id" value="{{ tag.id }}" />
+  <label for="id">{{ tag.name }}</label><br />
+  {% endfor %} {% endif %}
+  <br />
   <a href="/users/{{ user.id }}" class="btn btn-info">Cancel</a>
   <button class="btn btn-success">Add</button>
 </form>

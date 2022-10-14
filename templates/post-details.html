@@ -2,8 +2,17 @@
 content %}
 <h1>{{post.title}}</h1>
 <p>{{post.content}}</p>
-<p><em>By {{ user.full_name }}</em></p>
-<a href="/users/{{ post.user_id}}" class="btn btn-warning">Go Back</a>
-<a href="/posts/{{ post.id }}/edit" class="btn btn-primary">Edit</a>
-<a href="/posts/{{ post.id }}/delete" class="btn btn-danger">Delete</a>
+<p><em>By {{ post.user.full_name }} on {{ post.friendly_datetime }}</p></em>
+{% if post.tags %}
+<h6>Tags: 
+{% for tag in post.tags %}
+<span class="badge bg-primary">{{ tag.name }}</span>
+{% endfor %}
+</h6>
+{% endif %}
+<div class="btnDiv">
+    <a href="/users/{{ post.user_id}}" class="btn btn-warning">Go Back</a>
+    <a href="/posts/{{ post.id }}/edit" class="btn btn-primary">Edit</a>
+    <a href="/posts/{{ post.id }}/delete" class="btn btn-danger">Delete</a>
+</div>
 {% endblock %}

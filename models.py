@@ -48,7 +48,8 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    tags = db.relationship('Tag', secondary='posts_tags', backref='posts', cascade="all, delete-orphan", single_parent=True)
+    # tags = db.relationship('Tag', secondary='posts_tags', backref='posts', cascade="all, delete-orphan", single_parent=True)
+    tags = db.relationship('Tag', secondary='posts_tags', backref='posts')
 
     def __repr__(self):
         """Show info about post."""
