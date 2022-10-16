@@ -2,7 +2,9 @@
 
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, redirect, render_template, request, flash
-from models import db, connect_db, User, Post, Tag, desc
+from models import db, connect_db, User, Post, Tag
+from sqlalchemy import desc
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
